@@ -83,6 +83,25 @@ export default function MapPage() {
             Use my location
           </button>
         </div>
+
+        <div className="mt-6 flex flex-wrap gap-3">
+          <div className="flex items-center gap-2 rounded-3xl bg-slate-900/80 px-4 py-3 text-sm text-slate-200 shadow-sm">
+            <span className="h-3 w-3 rounded-full bg-emerald-400 shadow-sm" />
+            Clean
+          </div>
+          <div className="flex items-center gap-2 rounded-3xl bg-slate-900/80 px-4 py-3 text-sm text-slate-200 shadow-sm">
+            <span className="h-3 w-3 rounded-full bg-orange-400 shadow-sm" />
+            Needs attention
+          </div>
+          <div className="flex items-center gap-2 rounded-3xl bg-slate-900/80 px-4 py-3 text-sm text-slate-200 shadow-sm">
+            <span className="h-3 w-3 rounded-full bg-rose-500 shadow-sm" />
+            Poor hygiene
+          </div>
+          <div className="flex items-center gap-2 rounded-3xl bg-slate-900/80 px-4 py-3 text-sm text-slate-200 shadow-sm">
+            <span className="h-3 w-3 rounded-full bg-sky-500 shadow-sm" />
+            My location
+          </div>
+        </div>
       </section>
       <div id="safesan-map" className="h-[620px] rounded-[2rem] border border-white/10 bg-slate-900 shadow-soft" />
     </main>

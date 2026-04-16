@@ -1,12 +1,15 @@
 import { useAppContext } from '../context/AppContext.jsx';
 
-export default function ComplaintCard({ complaint }) {
+export default function ComplaintCard({ complaint, onOpenDetail }) {
   const { addUpvote, hasUpvoted } = useAppContext();
   const voted = hasUpvoted(complaint.id);
   const status = complaint.hygieneScore > 3.5 ? 'text-emerald-300' : complaint.hygieneScore >= 2.5 ? 'text-amber-300' : 'text-rose-300';
 
   return (
-    <article className="glass-card glass-card-hover overflow-hidden rounded-[2rem] border border-white/10 shadow-soft transition duration-300">
+    <article
+      onClick={onOpenDetail ? () => onOpenDetail(complaint) : undefined}
+      className="glass-card glass-card-hover cursor-pointer overflow-hidden rounded-[2rem] border border-white/10 shadow-soft transition duration-300 hover:-translate-y-1"
+    >
       <div className="relative h-56 overflow-hidden">
         <img src={complaint.image} alt={complaint.location} className="h-full w-full object-cover transition duration-500 hover:scale-105" />
         <div className="absolute left-4 top-4 rounded-full bg-slate-950/70 px-3 py-2 text-xs uppercase tracking-[0.22em] text-slate-200 shadow-sm">
@@ -33,7 +36,10 @@ export default function ComplaintCard({ complaint }) {
         <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <button
             type="button"
-            onClick={() => addUpvote(complaint.id)}
+            onClick={(event) => {
+              event.stopPropagation();
+              addUpvote(complaint.id);
+            }}
             disabled={voted}
             className={`action-button inline-flex items-center justify-center rounded-3xl px-4 py-3 text-sm font-semibold transition ${
               voted ? 'bg-slate-700 text-slate-200 cursor-not-allowed' : 'bg-brand-500 text-white hover:bg-brand-400'
@@ -41,9 +47,6 @@ export default function ComplaintCard({ complaint }) {
           >
             👍 {voted ? 'Upvoted' : `Upvote (${complaint.upvotes})`}
           </button>
-          {complaint.upvotes >= 8 && (
-            <span className="rounded-full bg-rose-500/10 px-3 py-2 text-sm font-semibold text-rose-200">🔥 Trending</span>
-          )}
         </div>
       </div>
     </article>

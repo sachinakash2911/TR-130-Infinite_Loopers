@@ -13,6 +13,7 @@ const initialComplaints = [
     description: 'Dirty floor and no soap',
     rating: 2,
     hygieneScore: 1.9,
+    review: 'Critical',
     tags: ['Cleanliness'],
     upvotes: 14,
     createdAt: '2026-04-16T08:30:00.000Z'
@@ -26,6 +27,7 @@ const initialComplaints = [
     description: 'Ramps are not accessible for wheelchairs',
     rating: 4,
     hygieneScore: 4.1,
+    review: 'Clean',
     tags: ['Accessibility'],
     upvotes: 8,
     createdAt: '2026-04-15T12:45:00.000Z'
@@ -39,6 +41,7 @@ const initialComplaints = [
     description: 'Water tap often runs dry',
     rating: 3,
     hygieneScore: 3.2,
+    review: 'Moderate',
     tags: ['Water'],
     upvotes: 11,
     createdAt: '2026-04-14T10:15:00.000Z'
@@ -99,6 +102,15 @@ export function AppProvider({ children }) {
     return true;
   };
 
+  const updateComplaintReview = (complaintId, review) => {
+    setComplaints((current) =>
+      current.map((item) =>
+        item.id === complaintId ? { ...item, review } : item
+      )
+    );
+    setToast({ message: 'Field officer review updated.', type: 'success' });
+  };
+
   const submitComplaint = async (incoming) => {
     const existing = complaints.find((item) => isDuplicate(item, incoming));
 
@@ -119,6 +131,7 @@ export function AppProvider({ children }) {
       description: incoming.description,
       rating: incoming.rating,
       hygieneScore: getHygieneScore(),
+      review: 'Moderate',
       tags: extractTags(incoming.description),
       upvotes: 1,
       createdAt: new Date().toISOString()
@@ -155,6 +168,7 @@ export function AppProvider({ children }) {
     submitComplaint,
     addUpvote,
     hasUpvoted,
+    updateComplaintReview,
     toast,
     setToast,
     sortedTrending,

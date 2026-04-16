@@ -7,19 +7,56 @@ export function extractTags(description) {
   const tags = new Set();
 
   if (text.includes('dirty') || text.includes('smell') || text.includes('filthy') || text.includes('unclean')) {
-    tags.add('Cleanliness');
+    tags.add('Sanitization');
   }
-  if (text.includes('no water') || text.includes('dry') || text.includes('tap') || text.includes('flush')) {
+  if (
+    text.includes('no water') ||
+    text.includes('dry') ||
+    text.includes('tap') ||
+    text.includes('flush') ||
+    text.includes('leak') ||
+    text.includes('leaking') ||
+    text.includes('leakage') ||
+    text.includes('pipe') ||
+    text.includes('drip') ||
+    text.includes('dripping') ||
+    text.includes('faucet') ||
+    text.includes('water outage') ||
+    text.includes('water supply')
+  ) {
     tags.add('Water');
   }
   if (text.includes('dark') || text.includes('lighting') || text.includes('light')) {
     tags.add('Lighting');
   }
-  if (text.includes('ramp') || text.includes('wheelchair') || text.includes('access') || text.includes('accessible')) {
+  if (
+    text.includes('ramp') ||
+    text.includes('wheelchair') ||
+    text.includes('access') ||
+    text.includes('accessible') ||
+    text.includes('lock') ||
+    text.includes('door') ||
+    text.includes('privacy') ||
+    text.includes('stall') ||
+    text.includes('cubicle') ||
+    text.includes('key')
+  ) {
     tags.add('Accessibility');
   }
 
-  return tags.size ? Array.from(tags) : ['Cleanliness'];
+  return tags.size ? Array.from(tags) : ['Sanitization'];
+}
+
+export function detectIssueType(description) {
+  const tags = extractTags(description || '');
+  if (tags.includes('Water')) return 'Water';
+  if (tags.includes('Accessibility')) return 'Accessibility';
+  if (tags.includes('Lighting')) return 'Lighting';
+  return 'Sanitization';
+}
+
+export function getAllIssueTypes(description) {
+  return extractTags(description || '');
 }
 
 export function isDuplicate(existing, incoming) {

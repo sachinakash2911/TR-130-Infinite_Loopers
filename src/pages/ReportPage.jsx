@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext.jsx';
-
-const issueTypes = ['Cleanliness', 'Water', 'Lighting', 'Accessibility'];
+import { detectIssueType, getAllIssueTypes } from '../utils/complaintUtils.js';
 
 function readFileAsDataUrl(file) {
   return new Promise((resolve) => {
@@ -17,8 +16,7 @@ export default function ReportPage() {
   const { submitComplaint } = useAppContext();
   const [location, setLocation] = useState('');
   const [coordinates, setCoordinates] = useState(null);
-  const [issueType, setIssueType] = useState('Cleanliness');
-  const [rating, setRating] = useState(3);
+  const [rating, setRating] = useState(0);
   const [description, setDescription] = useState('');
   const [imageFile, setImageFile] = useState(null);
   const [preview, setPreview] = useState('');
@@ -34,9 +32,19 @@ export default function ReportPage() {
   const handleUseLocation = () => {
     if (!navigator.geolocation) return;
     navigator.geolocation.getCurrentPosition(
-      (position) => {
-        setCoordinates({ lat: position.coords.latitude, lng: position.coords.longitude });
-        setLocation(`Lat ${position.coords.latitude.toFixed(3)}, Lng ${position.coords.longitude.toFixed(3)}`);
+      async (position) => {
+        const coords = { lat: position.coords.latitude, lng: position.coords.longitude };
+        setCoordinates(coords);
+        try {
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${coords.lat}&lon=${coords.lng}`
+          );
+          const data = await response.json();
+          const address = data.display_name || `Location ${coords.lat.toFixed(3)}, ${coords.lng.toFixed(3)}`;
+          setLocation(address);
+        } catch (error) {
+          setLocation(`Location ${coords.lat.toFixed(3)}, ${coords.lng.toFixed(3)}`);
+        }
       },
       () => {
         setLocation('Unable to get GPS. Enter location manually.');
@@ -50,11 +58,12 @@ export default function ReportPage() {
     const image = imageFile ? await readFileAsDataUrl(imageFile) : '';
     await new Promise((resolve) => setTimeout(resolve, 900));
 
+    const inferredIssueType = detectIssueType(description || '');
     await submitComplaint({
       image,
       location: location || 'Unknown location',
       coordinates: coordinates || { lat: 28.7041, lng: 77.1025 },
-      issueType,
+      issueType: inferredIssueType,
       description: description || 'No details provided',
       rating
     });
@@ -62,7 +71,6 @@ export default function ReportPage() {
     setIsSubmitting(false);
     setLocation('');
     setCoordinates(null);
-    setIssueType('Cleanliness');
     setRating(3);
     setDescription('');
     setImageFile(null);
@@ -100,30 +108,32 @@ export default function ReportPage() {
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <label className="block text-sm font-medium text-slate-200">
-              Issue type
-              <select
-                value={issueType}
-                onChange={(event) => setIssueType(event.target.value)}
-                className="mt-2 w-full rounded-3xl border border-white/10 bg-slate-900/80 px-4 py-3 text-slate-100 outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-500/20"
-              >
-                {issueTypes.map((type) => (
-                  <option key={type} value={type}>{type}</option>
+            <div className="block text-sm font-medium text-slate-200">
+              <div className="mb-2">Detected issue type</div>
+              <div className="rounded-3xl border border-white/10 bg-slate-900/80 px-4 py-4 text-slate-100">
+                {getAllIssueTypes(description || '').join(', ')}
+              </div>
+            </div>
+            <div className="block text-sm font-medium text-slate-200">
+              <div className="mb-3">Rating</div>
+              <div className="flex items-center gap-2">
+                {[1, 2, 3, 4, 5].map((value) => (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => setRating(value)}
+                    className={`inline-flex h-11 w-11 items-center justify-center rounded-2xl text-2xl transition ${
+                      value <= rating
+                        ? 'bg-amber-400/10 text-amber-300 shadow-[0_0_20px_rgba(250,204,21,0.18)]'
+                        : 'bg-slate-900/80 text-slate-500 hover:text-amber-300'
+                    }`}
+                  >
+                    ★
+                  </button>
                 ))}
-              </select>
-            </label>
-            <label className="block text-sm font-medium text-slate-200">
-              Rating
-              <input
-                type="range"
-                min="1"
-                max="5"
-                value={rating}
-                onChange={(event) => setRating(Number(event.target.value))}
-                className="mt-4 w-full accent-brand-500"
-              />
+              </div>
               <div className="mt-2 text-slate-100">{rating} / 5</div>
-            </label>
+            </div>
           </div>
 
           <label className="block text-sm font-medium text-slate-200">

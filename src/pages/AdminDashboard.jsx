@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useAppContext } from '../context/AppContext.jsx';
 
 function statusClass(score) {
@@ -7,8 +7,78 @@ function statusClass(score) {
   return 'bg-emerald-500/10 text-emerald-200';
 }
 
+function AdminComplaintOverlay({ complaint, onClose, onReviewChange }) {
+  if (!complaint) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4 backdrop-blur-sm">
+      <div className="relative w-full max-w-4xl overflow-hidden rounded-[2rem] border border-white/10 bg-slate-900/95 shadow-2xl">
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute right-4 top-4 rounded-full bg-slate-950/80 px-3 py-2 text-sm font-semibold text-slate-200 transition hover:bg-slate-900"
+        >
+          Close
+        </button>
+
+        <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr] p-6">
+          <div>
+            <img src={complaint.image} alt={complaint.location} className="h-72 w-full rounded-[1.5rem] object-cover shadow-lg" />
+            <div className="mt-6 rounded-[1.5rem] border border-white/10 bg-slate-950/80 p-6">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p className="text-sm uppercase tracking-[0.3em] text-emerald-300">Issue type</p>
+                  <h2 className="mt-2 text-2xl font-bold text-white">{complaint.issueType}</h2>
+                </div>
+                <span className="rounded-3xl bg-slate-800/80 px-4 py-2 text-sm font-semibold text-slate-200">{complaint.location}</span>
+              </div>
+
+              <p className="mt-5 text-slate-300">{complaint.description}</p>
+              <div className="mt-6 flex flex-wrap gap-2">
+                {complaint.tags.map((tag) => (
+                  <span key={tag} className="rounded-full bg-brand-500/10 px-3 py-2 text-xs uppercase tracking-[0.2em] text-brand-200">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-6 rounded-[1.5rem] border border-white/10 bg-slate-950/80 p-6">
+            <div className="space-y-3 rounded-3xl bg-slate-900/80 p-4 text-sm text-slate-300">
+              <p className="text-sm uppercase tracking-[0.3em] text-slate-400">Complaint details</p>
+              <p><span className="font-semibold text-slate-200">Hygiene score:</span> {complaint.hygieneScore}</p>
+              <p><span className="font-semibold text-slate-200">Upvotes:</span> {complaint.upvotes}</p>
+              <p><span className="font-semibold text-slate-200">Field officer review:</span> {complaint.review || 'Pending'}</p>
+              <p><span className="font-semibold text-slate-200">Posted:</span> {new Date(complaint.createdAt).toLocaleString()}</p>
+              {complaint.gps && <p><span className="font-semibold text-slate-200">GPS:</span> {complaint.gps}</p>}
+            </div>
+
+            <div className="space-y-3 rounded-3xl bg-slate-900/80 p-4 text-sm text-slate-300">
+              <label className="block text-sm uppercase tracking-[0.28em] text-slate-400">Field officer review</label>
+              <select
+                value={complaint.review || 'Moderate'}
+                onChange={(event) => onReviewChange(complaint.id, event.target.value)}
+                className="w-full rounded-3xl border border-white/10 bg-slate-950/80 px-4 py-3 text-sm text-slate-100 outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-500/20"
+              >
+                <option value="Clean">Clean</option>
+                <option value="Moderate">Moderate</option>
+                <option value="Critical">Critical</option>
+              </select>
+              <p className="text-xs text-slate-500">Update the officer assessment for this complaint.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function AdminDashboardPage() {
-  const { complaints, totalUpvotes, avgScore, sortedTrending } = useAppContext();
+  const { complaints, totalUpvotes, avgScore, sortedTrending, updateComplaintReview } = useAppContext();
+
+  const [selectedComplaintId, setSelectedComplaintId] = useState(null);
+  const selectedComplaint = complaints.find((item) => item.id === selectedComplaintId) || null;
 
   const alerts = useMemo(() => {
     return [...complaints]
@@ -50,11 +120,16 @@ export default function AdminDashboardPage() {
 
         <div className="grid gap-5 lg:grid-cols-2">
           {alerts.map((item) => (
-            <div key={item.id} className="rounded-[1.75rem] border border-white/10 bg-slate-950/80 p-5">
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => setSelectedComplaintId(item.id)}
+              className="group rounded-[1.75rem] border border-white/10 bg-slate-950/80 p-5 text-left transition hover:border-brand-400"
+            >
               <div className="flex items-center justify-between gap-3">
                 <div>
                   <p className="text-sm uppercase tracking-[0.28em] text-slate-400">{item.issueType}</p>
-                  <h2 className="mt-2 text-xl font-semibold text-white">{item.location}</h2>
+                  <h2 className="mt-2 text-xl font-semibold text-white group-hover:text-brand-300">{item.location}</h2>
                 </div>
                 <span className={`rounded-full px-3 py-2 text-sm font-semibold ${statusClass(item.hygieneScore)}`}>
                   {item.hygieneScore}
@@ -65,20 +140,33 @@ export default function AdminDashboardPage() {
                 <span>{item.upvotes} upvotes</span>
                 <span>{item.tags.join(', ')}</span>
               </div>
-            </div>
+            </button>
           ))}
         </div>
       </section>
 
       <section className="mt-8 grid gap-6 lg:grid-cols-3">
         {sortedTrending.map((item) => (
-          <div key={item.id} className="glass-card rounded-[2rem] p-6 shadow-soft">
-            <p className="text-sm uppercase tracking-[0.3em] text-slate-400">Trending issue</p>
+          <button
+            key={item.id}
+            type="button"
+            onClick={() => setSelectedComplaintId(item.id)}
+            className="glass-card rounded-[2rem] p-6 shadow-soft text-left transition hover:border-brand-400"
+          >
+            <p className="text-sm uppercase tracking-[0.3em] text-slate-400">Priority issue</p>
             <h2 className="mt-4 text-2xl font-semibold text-white">{item.location}</h2>
             <p className="mt-3 text-3xl font-extrabold text-brand-300">{item.upvotes} upvotes</p>
-          </div>
+          </button>
         ))}
       </section>
+
+      {selectedComplaint && (
+        <AdminComplaintOverlay
+          complaint={selectedComplaint}
+          onClose={() => setSelectedComplaintId(null)}
+          onReviewChange={updateComplaintReview}
+        />
+      )}
     </main>
   );
 }
