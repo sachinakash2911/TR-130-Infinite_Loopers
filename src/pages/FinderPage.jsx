@@ -2,6 +2,8 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useAppContext } from '../context/AppContext.jsx';
+import { fetchChennaiToilets } from '../utils/overpass.js';
+import { categorizeToilet } from '../utils/toiletCategorizer.js';
 import { getDistance } from '../utils/complaintUtils.js';
 
 export default function FinderPage() {

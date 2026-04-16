@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useAppContext } from '../context/AppContext.jsx';
+import { getSeverity } from '../utils/severityUtils.js';
 
 function statusClass(score) {
   if (score < 2.5) return 'bg-rose-500/10 text-rose-200';

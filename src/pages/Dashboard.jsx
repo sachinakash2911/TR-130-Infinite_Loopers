@@ -3,6 +3,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useAppContext } from '../context/AppContext.jsx';
 import ComplaintCard from '../components/ComplaintCard.jsx';
+import { getSeverity } from '../utils/severityUtils.js';
 
 const issueOptions = ['All', 'Cleanliness', 'Water', 'Lighting', 'Accessibility'];
 
@@ -105,7 +106,7 @@ function ComplaintDetailOverlay({ complaint, onClose }) {
                 <p className="text-sm uppercase tracking-[0.3em] text-slate-400">Location map</p>
                 <div ref={mapContainerRef} className="h-72 w-full overflow-hidden rounded-[1.5rem] border border-white/10 bg-slate-900" />
                 <div className="rounded-3xl border border-rose-500/20 bg-rose-500/5 p-4 text-sm text-rose-100">
-                  <p className="text-xs uppercase tracking-[0.3em] text-rose-300">Critical state</p>
+                  <p className="text-xs uppercase tracking-[0.3em] text-rose-300">SEVERITY LEVEL</p>
                   <p className="mt-2 font-semibold text-white">{criticalState}</p>
                   <p className="mt-1 text-xs text-slate-400">AI-trained severity will be shown here once the model integration is complete.</p>
                 </div>

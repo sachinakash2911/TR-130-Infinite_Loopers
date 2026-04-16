@@ -3,50 +3,7 @@ import { extractTags, getDistance, getHygieneScore, isDuplicate } from '../utils
 
 const AppContext = createContext(null);
 
-const initialComplaints = [
-  {
-    id: 1,
-    image: 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=1200&q=80',
-    location: 'Sector 14 Public Toilet',
-    coordinates: { lat: 28.7041, lng: 77.1025 },
-    issueType: 'Cleanliness',
-    description: 'Dirty floor and no soap',
-    rating: 2,
-    hygieneScore: 1.9,
-    review: 'Critical',
-    tags: ['Cleanliness'],
-    upvotes: 14,
-    createdAt: '2026-04-16T08:30:00.000Z'
-  },
-  {
-    id: 2,
-    image: 'https://images.unsplash.com/photo-1550446983-42ab4a7da11c?auto=format&fit=crop&w=1200&q=80',
-    location: 'Riverside Park Toilet',
-    coordinates: { lat: 28.707, lng: 77.106 },
-    issueType: 'Accessibility',
-    description: 'Ramps are not accessible for wheelchairs',
-    rating: 4,
-    hygieneScore: 4.1,
-    review: 'Clean',
-    tags: ['Accessibility'],
-    upvotes: 8,
-    createdAt: '2026-04-15T12:45:00.000Z'
-  },
-  {
-    id: 3,
-    image: 'https://images.unsplash.com/photo-1511393187461-a7983f2f8b77?auto=format&fit=crop&w=1200&q=80',
-    location: 'City Bus Terminal Washroom',
-    coordinates: { lat: 28.7055, lng: 77.11 },
-    issueType: 'Water',
-    description: 'Water tap often runs dry',
-    rating: 3,
-    hygieneScore: 3.2,
-    review: 'Moderate',
-    tags: ['Water'],
-    upvotes: 11,
-    createdAt: '2026-04-14T10:15:00.000Z'
-  }
-];
+const initialComplaints = [];
 
 function getStoredItem(key, fallback) {
   try {
@@ -131,6 +88,7 @@ export function AppProvider({ children }) {
       description: incoming.description,
       rating: incoming.rating,
       hygieneScore: getHygieneScore(),
+      severity: getSeverity(incoming.description),
       review: 'Moderate',
       tags: extractTags(incoming.description),
       upvotes: 1,

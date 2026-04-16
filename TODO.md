@@ -1,23 +1,23 @@
-# Fix Issue Detection - Show All Issues + Sanitization
+# Severity Classification System
 
-**Information Gathered:**
-- `src/utils/complaintUtils.js`: `extractTags()` gets multiple tags, `detectIssueType()` returns only 1st
-- `src/pages/ReportPage.jsx`: Displays single issue type in UI
-- ReportPage calls `detectIssueType(description)` - shows one issue only
+**Feedback**: Add CRITICAL/MODERATE severity detection based on keywords in description.
 
-**Plan Complete:**
-1. **src/utils/complaintUtils.js** ✓:
-   - 'Cleanliness' → 'Sanitization' updated
-   - `getAllIssueTypes()` added returning all tags
-2. **src/pages/ReportPage.jsx** ✓:
-   - UI now shows all issues: `getAllIssueTypes().join(', ')`
-   - Import updated
-3. **Next:** Test + `npm run dev`
+**Keywords**:
+**CRITICAL** (Red): no water, flush not working, very dirty, filthy, sewage, blocked, broken, unsafe, stinking, infection
+**MODERATE** (Orange): dirty, needs cleaning, low water, water leaking, dim light, door issue, average
+**Default**: LOW (Green)
 
-**Follow-up steps:**
-- Test ReportPage with sentence mentioning multiple issues (e.g. "no water and dirty")
-- Run `npm run dev` to verify
-- Update TODO on completion
+**Plan**:
+1. `src/utils/severityUtils.js` - `getSeverity(description)` returns 'CRITICAL'|'MODERATE'|'LOW'
+2. `components/ComplaintCard.jsx` - Add severity badge + color
+3. `src/pages/Dashboard.jsx` (user) - Update card with severity
+4. `src/pages/AdminDashboard.jsx` - Update card with severity
+5. AppContext `submitComplaint` - Auto-set severity
 
-Approve plan before edits?
+**Files to edit**:
+- components/ComplaintCard.jsx
+- pages/Dashboard.jsx  
+- pages/AdminDashboard.jsx
+
+Approve before proceeding?
 
