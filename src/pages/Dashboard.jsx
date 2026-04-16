@@ -5,7 +5,7 @@ import { useAppContext } from '../context/AppContext.jsx';
 import ComplaintCard from '../components/ComplaintCard.jsx';
 import { getSeverity } from '../utils/severityUtils.js';
 
-const issueOptions = ['All', 'Cleanliness', 'Water', 'Lighting', 'Accessibility'];
+const issueOptions = ['All', 'Sanitization', 'Water', 'Lighting', 'Accessibility'];
 
 function ComplaintDetailOverlay({ complaint, onClose }) {
   const mapContainerRef = useRef(null);

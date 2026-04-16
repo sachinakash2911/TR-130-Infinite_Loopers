@@ -23,7 +23,6 @@ export default function Navbar() {
             <>
               <NavLink to="/user-dashboard" className={linkClasses}>Dashboard</NavLink>
               <NavLink to="/report" className={linkClasses}>Report</NavLink>
-              <NavLink to="/map" className={linkClasses}>Map</NavLink>
               <NavLink to="/finder" className={linkClasses}>🚻 Finder</NavLink>
             </>
           )}

@@ -1,5 +1,8 @@
-export function getHygieneScore() {
-  return Number((Math.random() * 5).toFixed(1));
+import { predictHygiene } from './hygieneModel.js';
+
+export async function getHygieneScore(imageFile) {
+  if (!imageFile) return 3.0;
+  return await predictHygiene(imageFile);
 }
 
 export function extractTags(description) {

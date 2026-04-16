@@ -11,8 +11,8 @@ export default function MapPage() {
   useEffect(() => {
     if (!mapRef.current) {
       mapRef.current = L.map('safesan-map', {
-        center: [28.7041, 77.1025],
-        zoom: 13,
+        center: [12.823, 80.044],
+        zoom: 15,
         zoomControl: true
       });
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {

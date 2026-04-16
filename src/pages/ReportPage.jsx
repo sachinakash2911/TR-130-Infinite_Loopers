@@ -13,13 +13,15 @@ function readFileAsDataUrl(file) {
 
 export default function ReportPage() {
   const navigate = useNavigate();
-  const { submitComplaint } = useAppContext();
+  const { submitComplaint, setToast } = useAppContext();
   const [location, setLocation] = useState('');
   const [coordinates, setCoordinates] = useState(null);
   const [rating, setRating] = useState(0);
   const [description, setDescription] = useState('');
-  const [imageFile, setImageFile] = useState(null);
+const [imageFile, setImageFile] = useState(null);
   const [preview, setPreview] = useState('');
+  const [hygieneScore, setHygieneScore] = useState(null);
+  const [modelLoading, setModelLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleFile = async (event) => {
@@ -27,6 +29,18 @@ export default function ReportPage() {
     if (!file) return;
     setImageFile(file);
     setPreview(URL.createObjectURL(file));
+    setModelLoading(true);
+    setHygieneScore(null);
+    try {
+      const { getHygieneScore } = await import('../utils/complaintUtils.js');
+      const score = await getHygieneScore(file);
+      setHygieneScore(score);
+    } catch (error) {
+      console.error('Model prediction error:', error);
+      setHygieneScore(3.0);
+    } finally {
+      setModelLoading(false);
+    }
   };
 
   const handleUseLocation = () => {
@@ -65,16 +79,19 @@ export default function ReportPage() {
       coordinates: coordinates || { lat: 28.7041, lng: 77.1025 },
       issueType: inferredIssueType,
       description: description || 'No details provided',
-      rating
+      rating,
+      hygieneScore: hygieneScore || 5.0
     });
 
     setIsSubmitting(false);
+    setToast({ message: '✅ Report submitted! Check dashboard.', type: 'success' });
     setLocation('');
     setCoordinates(null);
-    setRating(3);
+    setRating(0);
     setDescription('');
     setImageFile(null);
     setPreview('');
+    setHygieneScore(null);
     navigate('/user-dashboard');
   };
 
@@ -158,11 +175,16 @@ export default function ReportPage() {
               />
             </label>
             <div className="rounded-[1.75rem] border border-white/10 bg-slate-900/80 p-4">
-              <p className="text-sm text-slate-400">Preview</p>
+              <p className="text-sm text-slate-400">Preview {modelLoading && ' | AI Analyzing...'}</p>
               {preview ? (
                 <img src={preview} alt="preview" className="mt-3 h-40 w-full rounded-3xl object-cover" />
               ) : (
                 <div className="mt-3 flex h-40 items-center justify-center rounded-3xl border border-dashed border-white/10 text-slate-500">No image selected</div>
+              )}
+              {hygieneScore !== null && (
+                <div className="mt-2 rounded-xl bg-emerald-500/10 p-2 text-center text-sm font-semibold text-emerald-300">
+                  AI Hygiene Score: {hygieneScore}/10
+                </div>
               )}
             </div>
           </div>

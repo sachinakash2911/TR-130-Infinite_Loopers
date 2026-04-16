@@ -1,3 +1,6 @@
-.env
 node_modules
+.env
 dist
+tfjs_env
+toilet_model.keras
+*.py

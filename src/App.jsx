@@ -59,7 +59,7 @@ function AppRoutes() {
           <Route
             path="/map"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute role="admin">
                 <MapPage />
               </ProtectedRoute>
             }
@@ -80,6 +80,15 @@ function AppRoutes() {
     </BrowserRouter>
   );
 }
+
+export async function preloadHygieneModel() {
+  const { loadModel } = await import('./utils/hygieneModel.js');
+  await loadModel();
+}
+
+// Preload model on app start
+preloadHygieneModel().catch(console.error);
+
 
 export default function App() {
   return (

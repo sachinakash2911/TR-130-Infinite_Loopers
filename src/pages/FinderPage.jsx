@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useAppContext } from '../context/AppContext.jsx';
-import { fetchChennaiToilets } from '../utils/overpass.js';
+import { fetchNearbyToilets } from '../utils/overpass.js';
 import { categorizeToilet } from '../utils/toiletCategorizer.js';
 import { getDistance } from '../utils/complaintUtils.js';
 
@@ -12,17 +12,31 @@ export default function FinderPage() {
   const [loadingLocation, setLoadingLocation] = useState(false);
   const [locationError, setLocationError] = useState('');
   const [search, setSearch] = useState('');
+  const [osmToilets, setOsmToilets] = useState([]);
   const mapRef = useRef(null);
   const mapContainerRef = useRef(null);
   const markerRefs = useRef([]);
 
-  const cleanToilets = useMemo(
-    () =>
-      complaints
-        .filter((item) => item.hygieneScore >= 3.5)
-        .filter((item) => item.coordinates?.lat && item.coordinates?.lng),
-    [complaints]
-  );
+  useEffect(() => {
+    if (!userLocation) return;
+    async function loadNearby() {
+      setLoadingLocation(true);
+      const data = await fetchNearbyToilets(userLocation.lat, userLocation.lng, 8);
+      const categorized = data.map(t => categorizeToilet(t, complaints));
+      setOsmToilets(categorized);
+      setLoadingLocation(false);
+    }
+    loadNearby();
+  }, [userLocation, complaints]);
+
+  const cleanToilets = useMemo(() => {
+    const userComplaints = complaints
+      .filter((item) => item.hygieneScore >= 3.5)
+      .filter((item) => item.coordinates?.lat && item.coordinates?.lng);
+      
+    const cleanOsm = osmToilets.filter(item => item.hygieneScore >= 3.5);
+    return [...userComplaints, ...cleanOsm];
+  }, [complaints, osmToilets]);
 
   const filteredToilets = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -58,14 +72,21 @@ export default function FinderPage() {
     )];
   }, [cleanToilets, search]);
 
-  const bestOption = filteredToilets.length > 0 && userLocation ? filteredToilets[0] : null;
+  const bestOption = useMemo(() => {
+    if (filteredToilets.length === 0 || !userLocation) return null;
+    return [...filteredToilets].sort((a, b) => {
+      const utilityA = a.hygieneScore - (a.distance * 0.5);
+      const utilityB = b.hygieneScore - (b.distance * 0.5);
+      return utilityB - utilityA;
+    })[0];
+  }, [filteredToilets, userLocation]);
 
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) return;
 
     const map = L.map(mapContainerRef.current, {
-      center: [28.7041, 77.1025],
-      zoom: 13,
+      center: [12.823, 80.044],
+      zoom: 15,
       zoomControl: true
     });
 
@@ -225,7 +246,7 @@ export default function FinderPage() {
                           <span className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs uppercase tracking-[0.25em] text-emerald-200">
                             Clean Toilet
                           </span>
-                          {index === 0 && (
+                          {item.id === bestOption?.id && (
                             <span className="rounded-full bg-brand-500/10 px-3 py-1 text-xs uppercase tracking-[0.25em] text-brand-200">
                               ⭐ Best Option Nearby
                             </span>
