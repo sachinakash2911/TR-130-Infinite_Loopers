@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAppContext } from '../context/AppContext.jsx';
 import { detectIssueType, getAllIssueTypes } from '../utils/complaintUtils.js';
 
@@ -12,6 +13,7 @@ function readFileAsDataUrl(file) {
 }
 
 export default function ReportPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { submitComplaint, setToast } = useAppContext();
   const [location, setLocation] = useState('');
@@ -61,7 +63,7 @@ const [imageFile, setImageFile] = useState(null);
         }
       },
       () => {
-        setLocation('Unable to get GPS. Enter location manually.');
+        setLocation(t('Unable to get GPS. Enter location manually.'));
       }
     );
   };
@@ -75,10 +77,10 @@ const [imageFile, setImageFile] = useState(null);
     const inferredIssueType = detectIssueType(description || '');
     await submitComplaint({
       image,
-      location: location || 'Unknown location',
+      location: location || t('Unknown location'),
       coordinates: coordinates || { lat: 28.7041, lng: 77.1025 },
       issueType: inferredIssueType,
-      description: description || 'No details provided',
+      description: description || t('No details provided'),
       rating,
       hygieneScore: hygieneScore || 5.0
     });
@@ -99,19 +101,19 @@ const [imageFile, setImageFile] = useState(null);
     <main className="mx-auto max-w-[900px] px-4 py-10 sm:px-6 lg:px-8">
       <div className="glass-card rounded-[2rem] border border-white/10 p-8 shadow-soft">
         <div className="mb-8">
-          <p className="text-sm uppercase tracking-[0.3em] text-emerald-300">Report</p>
-          <h1 className="mt-3 text-4xl font-extrabold text-white">Submit a sanitation report</h1>
-          <p className="mt-3 max-w-2xl text-slate-400">Add location, issue type, rating, and description.</p>
+          <p className="text-sm uppercase tracking-[0.3em] text-emerald-300">{t('Report')}</p>
+          <h1 className="mt-3 text-4xl font-extrabold text-white">{t('Submit a sanitation report')}</h1>
+          <p className="mt-3 max-w-2xl text-slate-400">{t('Add location, issue type, rating, and description.')}</p>
         </div>
 
         <form className="grid gap-6" onSubmit={handleSubmit}>
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="block text-sm font-medium text-slate-200">
-              Location
+              {t('Location')}
               <input
                 value={location}
                 onChange={(event) => setLocation(event.target.value)}
-                placeholder="Enter location or use GPS"
+                placeholder={t('Enter location or use GPS')}
                 className="mt-2 w-full rounded-3xl border border-white/10 bg-slate-900/80 px-4 py-3 text-slate-100 outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-500/20"
               />
             </label>
@@ -120,19 +122,19 @@ const [imageFile, setImageFile] = useState(null);
               onClick={handleUseLocation}
               className="inline-flex items-center justify-center rounded-3xl bg-slate-800 px-4 py-3 text-sm font-semibold text-slate-100 transition hover:bg-slate-700"
             >
-              📍 Use Current Location
+              {t('Use Current Location')}
             </button>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="block text-sm font-medium text-slate-200">
-              <div className="mb-2">Detected issue type</div>
+              <div className="mb-2">{t('Detected issue type')}</div>
               <div className="rounded-3xl border border-white/10 bg-slate-900/80 px-4 py-4 text-slate-100">
                 {getAllIssueTypes(description || '').join(', ')}
               </div>
             </div>
             <div className="block text-sm font-medium text-slate-200">
-              <div className="mb-3">Rating</div>
+              <div className="mb-3">{t('Rating')}</div>
               <div className="flex items-center gap-2">
                 {[1, 2, 3, 4, 5].map((value) => (
                   <button
@@ -154,19 +156,19 @@ const [imageFile, setImageFile] = useState(null);
           </div>
 
           <label className="block text-sm font-medium text-slate-200">
-            Description
+            {t('Description')}
             <textarea
               value={description}
               onChange={(event) => setDescription(event.target.value)}
               rows="5"
-              placeholder="Describe the issue in a few words"
+              placeholder={t('Describe the issue in a few words')}
               className="mt-2 w-full rounded-3xl border border-white/10 bg-slate-900/80 px-4 py-3 text-slate-100 outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-500/20"
             />
           </label>
 
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="block text-sm font-medium text-slate-200">
-              Upload image
+              {t('Upload image')}
               <input
                 type="file"
                 accept="image/*"
@@ -175,15 +177,15 @@ const [imageFile, setImageFile] = useState(null);
               />
             </label>
             <div className="rounded-[1.75rem] border border-white/10 bg-slate-900/80 p-4">
-              <p className="text-sm text-slate-400">Preview {modelLoading && ' | AI Analyzing...'}</p>
+              <p className="text-sm text-slate-400">{t('Preview')} {modelLoading && ` | ${t('AI Analyzing...')}`}</p>
               {preview ? (
                 <img src={preview} alt="preview" className="mt-3 h-40 w-full rounded-3xl object-cover" />
               ) : (
-                <div className="mt-3 flex h-40 items-center justify-center rounded-3xl border border-dashed border-white/10 text-slate-500">No image selected</div>
+                <div className="mt-3 flex h-40 items-center justify-center rounded-3xl border border-dashed border-white/10 text-slate-500">{t('No image selected')}</div>
               )}
               {hygieneScore !== null && (
                 <div className="mt-2 rounded-xl bg-emerald-500/10 p-2 text-center text-sm font-semibold text-emerald-300">
-                  AI Hygiene Score: {hygieneScore}/10
+                  {t('AI Hygiene Score:')} {hygieneScore}/10
                 </div>
               )}
             </div>
@@ -194,7 +196,7 @@ const [imageFile, setImageFile] = useState(null);
             disabled={isSubmitting}
             className="action-button inline-flex items-center justify-center rounded-3xl bg-brand-500 px-6 py-4 text-base font-semibold text-white transition hover:bg-brand-400 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {isSubmitting ? 'Submitting...' : 'Send report'}
+            {isSubmitting ? t('Submitting...') : t('Send report')}
           </button>
         </form>
       </div>

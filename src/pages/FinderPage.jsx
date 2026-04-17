@@ -7,6 +7,7 @@ import { categorizeToilet } from '../utils/toiletCategorizer.js';
 import { getDistance } from '../utils/complaintUtils.js';
 
 export default function FinderPage() {
+  const { t } = useTranslation();
   const { complaints } = useAppContext();
   const [userLocation, setUserLocation] = useState(null);
   const [loadingLocation, setLoadingLocation] = useState(false);
@@ -176,11 +177,11 @@ export default function FinderPage() {
       <section className="mb-8 rounded-[2rem] border border-white/10 bg-slate-950/80 p-6 shadow-soft">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p className="text-sm uppercase tracking-[0.32em] text-emerald-300">Finder</p>
-            <h1 className="mt-2 text-3xl font-extrabold text-white">Find clean toilets nearby</h1>
-            <p className="mt-2 max-w-2xl text-sm text-slate-400">
-              Using your location, this page surfaces the nearest clean toilets from stored SafeSan reports.
-            </p>
+              <p className="text-sm uppercase tracking-[0.32em] text-emerald-300">{t('Finder')}</p>
+              <h1 className="mt-2 text-3xl font-extrabold text-white">{t('Find clean toilets nearby')}</h1>
+              <p className="mt-2 max-w-2xl text-sm text-slate-400">
+                {t('Using your location, this page surfaces the nearest clean toilets from stored SafeSan reports.')}
+              </p>
           </div>
 
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -189,9 +190,9 @@ export default function FinderPage() {
               onClick={requestLocation}
               className="inline-flex items-center justify-center rounded-3xl bg-brand-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-400"
             >
-              {loadingLocation ? 'Fetching location…' : 'Detect my location'}
+              {loadingLocation ? t('Fetching location…') : t('Detect my location')}
             </button>
-            {locationError && <span className="text-sm text-rose-300">{locationError}</span>}
+            {locationError && <span className="text-sm text-rose-300">{t('Location access required')}</span>}
           </div>
         </div>
       </section>
@@ -199,11 +200,11 @@ export default function FinderPage() {
       <div className="grid gap-6 xl:grid-cols-[0.45fr_0.55fr]">
         <div className="glass-card rounded-[2rem] border border-white/10 bg-white/10 p-6 shadow-soft backdrop-blur-xl">
           <div className="relative">
-            <label className="block text-sm uppercase tracking-[0.28em] text-slate-400">Search location</label>
+            <label className="block text-sm uppercase tracking-[0.28em] text-slate-400">{t('Search location')}</label>
             <input
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search by toilet location"
+              placeholder={t('Search by toilet location')}
               className="mt-3 w-full rounded-[1.5rem] border border-white/10 bg-slate-950/80 px-4 py-3 text-white outline-none transition focus:border-brand-400 focus:ring-2 focus:ring-brand-500/20"
             />
             {suggestions.length > 0 && (

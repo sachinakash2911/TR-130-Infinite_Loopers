@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useAppContext } from '../context/AppContext.jsx';
@@ -120,6 +121,7 @@ function ComplaintDetailOverlay({ complaint, onClose }) {
 }
 
 export default function DashboardPage() {
+  const { t } = useTranslation();
   const { complaints, totalUpvotes, avgScore } = useAppContext();
   const [search, setSearch] = useState('');
   const [issueType, setIssueType] = useState('All');
@@ -142,15 +144,15 @@ export default function DashboardPage() {
     <main className="mx-auto max-w-[1400px] px-4 py-10 sm:px-6 lg:px-8">
       <section className="mb-8 grid gap-6 lg:grid-cols-3">
         <div className="glass-card rounded-[2rem] p-6 shadow-soft">
-          <p className="text-sm uppercase tracking-[0.3em] text-slate-400">Total complaints</p>
+          <p className="text-sm uppercase tracking-[0.3em] text-slate-400">{t('Total complaints')}</p>
           <p className="mt-4 text-4xl font-extrabold text-white">{complaints.length}</p>
         </div>
         <div className="glass-card rounded-[2rem] p-6 shadow-soft">
-          <p className="text-sm uppercase tracking-[0.3em] text-slate-400">Average score</p>
+          <p className="text-sm uppercase tracking-[0.3em] text-slate-400">{t('Average score')}</p>
           <p className="mt-4 text-4xl font-extrabold text-emerald-300">{avgScore}</p>
         </div>
         <div className="glass-card rounded-[2rem] p-6 shadow-soft">
-          <p className="text-sm uppercase tracking-[0.3em] text-slate-400">Total upvotes</p>
+          <p className="text-sm uppercase tracking-[0.3em] text-slate-400">{t('Total upvotes')}</p>
           <p className="mt-4 text-4xl font-extrabold text-brand-300">{totalUpvotes}</p>
         </div>
       </section>
@@ -158,14 +160,14 @@ export default function DashboardPage() {
       <section className="glass-card rounded-[2rem] border border-white/10 p-6 shadow-soft">
         <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p className="text-sm uppercase tracking-[0.3em] text-emerald-300">Dashboard</p>
-            <h1 className="mt-3 text-3xl font-extrabold text-white">Sanitation complaints</h1>
+            <p className="text-sm uppercase tracking-[0.3em] text-emerald-300">{t('Dashboard')}</p>
+            <h1 className="mt-3 text-3xl font-extrabold text-white">{t('Sanitation complaints')}</h1>
           </div>
           <div className="grid gap-3 sm:grid-cols-3">
             <input
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search location or issue"
+              placeholder={t('Search location or issue')}
               className="rounded-3xl border border-white/10 bg-slate-900/80 px-4 py-3 text-slate-100 outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-500/20"
             />
             <select
@@ -174,7 +176,7 @@ export default function DashboardPage() {
               className="rounded-3xl border border-white/10 bg-slate-900/80 px-4 py-3 text-slate-100 outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-500/20"
             >
               {issueOptions.map((option) => (
-                <option key={option} value={option}>{option}</option>
+                <option key={option} value={option}>{t(option)}</option>
               ))}
             </select>
             <select
@@ -182,8 +184,8 @@ export default function DashboardPage() {
               onChange={(event) => setSortKey(event.target.value)}
               className="rounded-3xl border border-white/10 bg-slate-900/80 px-4 py-3 text-slate-100 outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-500/20"
             >
-              <option value="latest">Latest</option>
-              <option value="upvotes">Most upvoted</option>
+              <option value="latest">{t('Latest')}</option>
+              <option value="upvotes">{t('Most upvoted')}</option>
             </select>
           </div>
         </div>
@@ -200,7 +202,7 @@ export default function DashboardPage() {
 
         {!filtered.length && (
           <div className="mt-8 rounded-[2rem] border border-dashed border-white/10 bg-slate-900/80 p-8 text-center text-slate-400">
-            No complaints match your search.
+            {t('No complaints match your search.')}
           </div>
         )}
       </section>
