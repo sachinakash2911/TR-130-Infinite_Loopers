@@ -1,0 +1,22 @@
+export const trichyToilets = [
+  { lat: 10.7905, lng: 78.7047, name: "Central Bus Stand Toilet", hygieneScore: 4.2 },
+  { lat: 10.7870, lng: 78.7035, name: "Chathiram Bus Stand Toilet", hygieneScore: 3.8 },
+  { lat: 10.8070, lng: 78.6856, name: "Rockfort Area Public Toilet", hygieneScore: 2.1 },
+  { lat: 10.8281, lng: 78.6937, name: "Srirangam Temple Toilet", hygieneScore: 4.5 },
+  { lat: 10.8245, lng: 78.7012, name: "Srirangam Bus Stop Toilet", hygieneScore: 3.2 },
+  { lat: 10.7900, lng: 78.6980, name: "Railway Junction Toilet", hygieneScore: 2.8 },
+  { lat: 10.7845, lng: 78.7005, name: "Cantonment Area Toilet", hygieneScore: 4.0 },
+  { lat: 10.8152, lng: 78.7021, name: "Woraiyur Public Toilet", hygieneScore: 1.9 },
+  { lat: 10.8050, lng: 78.7100, name: "Thillai Nagar Toilet", hygieneScore: 3.6 },
+  { lat: 10.8125, lng: 78.6950, name: "Melur Public Toilet", hygieneScore: 2.4 },
+  { lat: 10.7990, lng: 78.7200, name: "KK Nagar Toilet", hygieneScore: 4.1 },
+  { lat: 10.7750, lng: 78.7105, name: "BHEL Township Toilet", hygieneScore: 3.9 },
+  { lat: 10.7600, lng: 78.7150, name: "Airport Area Toilet", hygieneScore: 2.2 },
+  { lat: 10.8300, lng: 78.7100, name: "Ammamandapam Toilet", hygieneScore: 4.3 },
+  { lat: 10.8200, lng: 78.6800, name: "TVS Tollgate Toilet", hygieneScore: 1.7 },
+  { lat: 10.8005, lng: 78.6900, name: "Golden Rock Area Toilet", hygieneScore: 3.4 },
+  { lat: 10.7855, lng: 78.7200, name: "Subramaniyapuram Toilet", hygieneScore: 2.6 },
+  { lat: 10.7700, lng: 78.6950, name: "Ponmalai Toilet", hygieneScore: 4.4 },
+  { lat: 10.8100, lng: 78.7150, name: "Puthur Public Toilet", hygieneScore: 3.1 },
+  { lat: 10.7950, lng: 78.7300, name: "Ariyamangalam Toilet", hygieneScore: 2.9 }
+];

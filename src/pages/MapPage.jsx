@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useAppContext } from '../context/AppContext.jsx';
+import { trichyToilets } from '../utils/toiletData.js';
 
 export default function MapPage() {
   const { complaints } = useAppContext();
@@ -11,8 +12,8 @@ export default function MapPage() {
   useEffect(() => {
     if (!mapRef.current) {
       mapRef.current = L.map('safesan-map', {
-        center: [12.823, 80.044],
-        zoom: 15,
+        center: [10.7905, 78.7047],
+        zoom: 13,
         zoomControl: true
       });
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -42,6 +43,24 @@ export default function MapPage() {
           <p class="font-semibold text-slate-900">${item.issueType}</p>
           <p class="text-sm text-slate-700">${item.location}</p>
           <p class="mt-2 text-sm text-slate-700">Score: ${item.hygieneScore}</p>
+        </div>
+      `);
+    });
+
+    trichyToilets.forEach(toilet => {
+      const color = toilet.hygieneScore > 3.5 ? '#34d399' : toilet.hygieneScore >= 2.5 ? '#fbbf24' : '#fb7185';
+      const marker = L.circleMarker([toilet.lat, toilet.lng], {
+        radius: 8,
+        fillColor: color,
+        color: '#fff',
+        weight: 2,
+        opacity: 1,
+        fillOpacity: 0.9
+      }).addTo(mapRef.current);
+      marker.bindPopup(`
+        <div class="max-w-xs">
+          <p class="font-semibold text-slate-900">${toilet.name}</p>
+          <p class="mt-2 text-sm text-slate-700">Score: ${toilet.hygieneScore}</p>
         </div>
       `);
     });
