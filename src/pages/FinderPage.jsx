@@ -6,6 +6,7 @@ import { useAppContext } from '../context/AppContext.jsx';
 import { fetchNearbyToilets } from '../utils/overpass.js';
 import { categorizeToilet } from '../utils/toiletCategorizer.js';
 import { getDistance } from '../utils/complaintUtils.js';
+import { trichyToilets } from '../utils/toiletData.js';
 
 export default function FinderPage() {
   const { t } = useTranslation();
@@ -37,13 +38,13 @@ export default function FinderPage() {
       .filter((item) => item.coordinates?.lat && item.coordinates?.lng);
       
     const cleanOsm = osmToilets.filter(item => item.hygieneScore >= 3.5);
-    return [...userComplaints, ...cleanOsm];
+    return [...userComplaints, ...cleanOsm, ...trichyToilets];
   }, [complaints, osmToilets]);
 
   const filteredToilets = useMemo(() => {
     const query = search.trim().toLowerCase();
     const candidates = query
-      ? cleanToilets.filter((item) => item.location.toLowerCase().includes(query))
+      ? cleanToilets.filter((item) => (item.location || item.name).toLowerCase().includes(query))
       : cleanToilets;
 
     if (!userLocation) {
@@ -56,8 +57,8 @@ export default function FinderPage() {
         distance: getDistance(
           userLocation.lat,
           userLocation.lng,
-          item.coordinates.lat,
-          item.coordinates.lng
+          item.coordinates?.lat || item.lat,
+          item.coordinates?.lng || item.lng
         )
       }))
       .sort((a, b) => a.distance - b.distance);
@@ -68,9 +69,9 @@ export default function FinderPage() {
     if (!query) return [];
     return [...new Set(
       cleanToilets
-        .filter((item) => item.location.toLowerCase().includes(query))
+        .filter((item) => (item.location || item.name).toLowerCase().includes(query))
         .slice(0, 6)
-        .map((item) => item.location)
+        .map((item) => item.location || item.name)
     )];
   }, [cleanToilets, search]);
 
@@ -128,16 +129,19 @@ export default function FinderPage() {
 
     filteredToilets.forEach((item) => {
       if (item.distance == null) return;
-      const marker = L.circleMarker([item.coordinates.lat, item.coordinates.lng], {
+      const lat = item.coordinates?.lat || item.lat;
+      const lng = item.coordinates?.lng || item.lng;
+      const color = item.hygieneScore > 3.5 ? '#34d399' : item.hygieneScore >= 2.5 ? '#fbbf24' : '#fb7185';
+      const marker = L.circleMarker([lat, lng], {
         radius: 9,
-        fillColor: '#34d399',
+        fillColor: color,
         color: '#fff',
         weight: 2,
         fillOpacity: 0.9
       })
         .addTo(map)
         .bindPopup(
-          `<strong>${item.location}</strong><br/>Score: ${item.hygieneScore}<br/>${item.distance.toFixed(1)} km away`
+          `<strong>${item.location || item.name}</strong><br/>Score: ${item.hygieneScore}<br/>${item.distance.toFixed(1)} km away`
         );
 
       markerRefs.current.push(marker);
@@ -228,7 +232,7 @@ export default function FinderPage() {
             {bestOption && (
               <div className="rounded-[1.75rem] border border-brand-400/20 bg-brand-500/10 p-5 text-slate-50 shadow-soft">
                 <p className="text-xs uppercase tracking-[0.3em] text-brand-200">Best Option Nearby</p>
-                <h2 className="mt-3 text-xl font-semibold">{bestOption.location}</h2>
+                <h2 className="mt-3 text-xl font-semibold">{bestOption.location || bestOption.name}</h2>
                 <p className="mt-2 text-sm text-slate-200">
                   {bestOption.distance.toFixed(1)} km away · Score {bestOption.hygieneScore}
                 </p>
@@ -254,15 +258,15 @@ export default function FinderPage() {
                             </span>
                           )}
                         </div>
-                        <h2 className="mt-4 text-lg font-semibold text-white">{item.location}</h2>
-                        <p className="mt-2 text-sm text-slate-400">{item.tags.join(', ')}</p>
+                        <h2 className="mt-4 text-lg font-semibold text-white">{item.location || item.name}</h2>
+                        <p className="mt-2 text-sm text-slate-400">{item.tags ? item.tags.join(', ') : 'Public Toilet'}</p>
                       </div>
 
                       <div className="flex flex-col items-start gap-3 text-right lg:items-end">
                         <p className="text-sm text-slate-400">{item.distance.toFixed(1)} km away</p>
                         <p className="text-sm text-slate-200">Score: {item.hygieneScore}</p>
                         <a
-                          href={`https://www.google.com/maps?q=${item.coordinates.lat},${item.coordinates.lng}`}
+                          href={`https://www.google.com/maps?q=${item.coordinates?.lat || item.lat},${item.coordinates?.lng || item.lng}`}
                           target="_blank"
                           rel="noreferrer"
                           className="inline-flex items-center justify-center rounded-3xl bg-brand-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-400"

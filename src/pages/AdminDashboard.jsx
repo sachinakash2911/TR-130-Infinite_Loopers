@@ -1,9 +1,6 @@
-import { useMemo, useState, useEffect, useRef } from 'react';
+import { useMemo, useState } from 'react';
 import { useAppContext } from '../context/AppContext.jsx';
 import { getSeverity } from '../utils/severityUtils.js';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
-import { trichyToilets } from '../utils/toiletData.js';
 
 function statusClass(score) {
   if (score < 2.5) return 'bg-rose-500/10 text-rose-200';
@@ -82,46 +79,7 @@ export default function AdminDashboardPage() {
   const { complaints, totalUpvotes, avgScore, sortedTrending, updateComplaintReview } = useAppContext();
 
   const [selectedComplaintId, setSelectedComplaintId] = useState(null);
-  const mapRef = useRef(null);
   const selectedComplaint = complaints.find((item) => item.id === selectedComplaintId) || null;
-
-  useEffect(() => {
-    if (!mapRef.current) {
-      mapRef.current = L.map('admin-map', {
-        center: [10.7905, 78.7047],
-        zoom: 12,
-        zoomControl: true
-      });
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '© OpenStreetMap'
-      }).addTo(mapRef.current);
-    }
-
-    mapRef.current.eachLayer((layer) => {
-      if (layer instanceof L.Marker) {
-        mapRef.current.removeLayer(layer);
-      }
-    });
-
-    trichyToilets.forEach(toilet => {
-      const color = toilet.hygieneScore > 3.5 ? '#34d399' : toilet.hygieneScore >= 2.5 ? '#fbbf24' : '#fb7185';
-      const marker = L.circleMarker([toilet.lat, toilet.lng], {
-        radius: 8,
-        fillColor: color,
-        color: '#fff',
-        weight: 2,
-        opacity: 1,
-        fillOpacity: 0.9
-      }).addTo(mapRef.current);
-      marker.bindPopup(`
-        <div class="max-w-xs">
-          <p class="font-semibold text-slate-900">${toilet.name}</p>
-          <p class="mt-2 text-sm text-slate-700">Score: ${toilet.hygieneScore}</p>
-        </div>
-      `);
-    });
-  }, []);
 
   const alerts = useMemo(() => {
     return [...complaints]
@@ -201,28 +159,6 @@ export default function AdminDashboardPage() {
             <p className="mt-3 text-3xl font-extrabold text-brand-300">{item.upvotes} upvotes</p>
           </button>
         ))}
-      </section>
-
-      <section className="mt-8 rounded-[2rem] border border-white/10 bg-slate-950/80 p-6 shadow-soft">
-        <div className="mb-6">
-          <p className="text-sm uppercase tracking-[0.3em] text-slate-400">Toilet locations</p>
-          <h1 className="mt-3 text-3xl font-extrabold text-white">Public toilets in Trichy</h1>
-        </div>
-        <div id="admin-map" className="h-[400px] rounded-[1.5rem] border border-white/10 bg-slate-900 shadow-soft" />
-        <div className="mt-4 flex flex-wrap gap-3">
-          <div className="flex items-center gap-2 rounded-3xl bg-slate-900/80 px-4 py-3 text-sm text-slate-200 shadow-sm">
-            <span className="h-3 w-3 rounded-full bg-emerald-400 shadow-sm" />
-            Clean (Score &gt; 3.5)
-          </div>
-          <div className="flex items-center gap-2 rounded-3xl bg-slate-900/80 px-4 py-3 text-sm text-slate-200 shadow-sm">
-            <span className="h-3 w-3 rounded-full bg-orange-400 shadow-sm" />
-            Needs attention (Score 2.5-3.5)
-          </div>
-          <div className="flex items-center gap-2 rounded-3xl bg-slate-900/80 px-4 py-3 text-sm text-slate-200 shadow-sm">
-            <span className="h-3 w-3 rounded-full bg-rose-500 shadow-sm" />
-            Poor hygiene (Score &lt; 2.5)
-          </div>
-        </div>
       </section>
 
       {selectedComplaint && (
